@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}SmartHome - Panel de Administración{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Panel de Administración</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Gestión de Usuarios</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.nombre }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <a href="{{ url_for('usuarios.editar', usuario_id=user.id) }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <form action="{{ url_for('usuarios.eliminar', usuario_id=user.id) }}" method="post" class="d-inline">
+                                            <button class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de eliminar este usuario?')">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Estado del Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <p>Total de usuarios: {{ users|length }}</p>
+                    <!-- Aquí puedes agregar más estadísticas -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

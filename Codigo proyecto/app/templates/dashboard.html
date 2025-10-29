@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}SmartHome - Mi Panel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Bienvenido, {{ user.nombre }}</h2>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Mis Dispositivos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Próximamente podrás controlar tus dispositivos IoT desde aquí.
+                    </div>
+                    <!-- Aquí se agregará la lista de dispositivos en próximas actualizaciones -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

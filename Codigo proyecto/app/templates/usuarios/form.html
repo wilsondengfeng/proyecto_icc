@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}{{ 'Editar' if usuario else 'Nuevo' }} Usuario{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h4 class="mb-3">{{ 'Editar' if usuario else 'Nuevo' }} Usuario</h4>
+    <form method="post">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input name="nombre" class="form-control" value="{{ usuario.nombre if usuario else '' }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" value="{{ usuario.email if usuario else '' }}" required>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary" href="{{ url_for('usuarios.index') }}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
