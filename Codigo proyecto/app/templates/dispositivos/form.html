@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ 'Editar' if dispositivo else 'Nuevo' }} Dispositivo{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{{ 'Editar' if dispositivo else 'Nuevo' }} Dispositivo</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            <div class="mb-3">
+              <label class="form-label">Nombre</label>
+              <input name="nombre" class="form-control" value="{{ dispositivo.nombre if dispositivo else '' }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tipo</label>
+              <select name="tipo" class="form-select">
+                <option value="luz" {% if dispositivo and dispositivo.tipo=='luz' %}selected{% endif %}>Luz</option>
+                <option value="sensor" {% if dispositivo and dispositivo.tipo=='sensor' %}selected{% endif %}>Sensor</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Usuario (opcional)</label>
+              <input name="usuario_id" class="form-control" value="{{ dispositivo.usuario_id if dispositivo else '' }}">
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary">Guardar</button>
+              <a href="{{ url_for('dispositivos.index') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

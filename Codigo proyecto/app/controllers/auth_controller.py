@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.services.auth_service import AuthService
+from app.services.dispositivo_service import DispositivoService
 from functools import wraps
 
 bp = Blueprint("auth", __name__)
 auth_service = AuthService()
+disp_service = DispositivoService()
 
 def login_required(view):
     @wraps(view)
@@ -56,7 +58,8 @@ def logout():
 @admin_required
 def admin_dashboard():
     users = auth_service.listar_usuarios()
-    return render_template("admin/dashboard.html", users=users)
+    dispositivos = disp_service.listar_todos()
+    return render_template("admin/dashboard.html", users=users, dispositivos=dispositivos)
 
 @bp.route("/dashboard")
 @login_required

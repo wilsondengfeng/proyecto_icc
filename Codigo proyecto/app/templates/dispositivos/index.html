@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}Dispositivos - SmartHome{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Dispositivos</h3>
+    {% if session.is_admin %}
+    <a href="{{ url_for('dispositivos.crear') }}" class="btn btn-primary">Nuevo dispositivo</a>
+    {% endif %}
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Usuario</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in dispositivos %}
+        <tr>
+          <td>{{ d.id }}</td>
+          <td>{{ d.nombre }}</td>
+          <td>{{ d.tipo }}</td>
+          <td>
+            {% if d.tipo == 'luz' %}
+              <form action="{{ url_for('dispositivos.toggle', dispositivo_id=d.id) }}" method="post" class="d-inline toggle-form">
+                <button class="btn btn-sm {{ 'btn-success' if d.estado else 'btn-outline-secondary' }}">{{ 'ON' if d.estado else 'OFF' }}</button>
+              </form>
+            {% else %}
+              {{ 'activo' if d.estado else 'inactivo' }}
+            {% endif %}
+          </td>
+          <td>{{ d.usuario_id or '-' }}</td>
+          <td>
+            {% if session.is_admin %}
+              <a href="{{ url_for('dispositivos.editar', dispositivo_id=d.id) }}" class="btn btn-sm btn-primary">Editar</a>
+              <form action="{{ url_for('dispositivos.eliminar', dispositivo_id=d.id) }}" method="post" class="d-inline">
+                <button class="btn btn-sm btn-danger" onclick="return confirm('Eliminar dispositivo?')">Eliminar</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
