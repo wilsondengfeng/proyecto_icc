@@ -1,7 +1,7 @@
 import pymysql
 from flask import current_app
+from werkzeug.security import generate_password_hash
 from app.models.usuario import Usuario
-
 
 class UsuarioRepository:
     def _get_connection(self):
@@ -39,9 +39,10 @@ class UsuarioRepository:
         try:
             with con.cursor() as cur:
                 # default password for created users in this prototype is '123456'
+                default_pw_hashed = generate_password_hash('123456')
                 cur.execute(
                     "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
-                    (usuario.nombre, usuario.email, '123456'),
+                    (usuario.nombre, usuario.email, default_pw_hashed),
                 )
                 con.commit()
                 return cur.lastrowid

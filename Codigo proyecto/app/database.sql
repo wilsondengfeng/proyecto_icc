@@ -60,4 +60,4 @@ VALUES
 INSERT INTO dispositivos (nombre, tipo, estado, usuario_id) VALUES
 ('Luz Sala', 'luz', FALSE, 1),
 ('Sensor Movimiento', 'sensor', TRUE, 1),
-('Luz Cocina', 'luz', TRUE, 2);
+('Luz Cocina', 'luz', TRUE, 2); 

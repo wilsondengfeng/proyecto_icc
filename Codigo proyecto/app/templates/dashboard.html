@@ -12,11 +12,35 @@
                     <h5 class="card-title mb-0">Mis Dispositivos</h5>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        Próximamente podrás controlar tus dispositivos IoT desde aquí.
+                    {% if dispositivos is defined and dispositivos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for d in dispositivos %}
+                                <tr>
+                                    <td>{{ d.id }}</td>
+                                    <td>{{ d.nombre }}</td>
+                                    <td>{{ d.tipo }}</td>
+                                    <td>{{ 'ON' if d.estado else 'OFF' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <!-- Aquí se agregará la lista de dispositivos en próximas actualizaciones -->
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        No tienes dispositivos asignados.
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

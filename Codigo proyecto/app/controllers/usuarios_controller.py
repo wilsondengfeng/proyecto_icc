@@ -1,15 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.repositories.usuario_repository import UsuarioRepository
-from app.models.usuario import Usuario
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from app.controllers.auth_controller import admin_required
 
 bp = Blueprint("usuarios", __name__)
-repo = UsuarioRepository()
 
 @bp.route("/", methods=["GET"])
 @admin_required
 def index():
-    usuarios = repo.obtener_todos()
+    usuarios = current_app.usuario_service.listar()
     return render_template("usuarios/index.html", usuarios=usuarios)
 
 @bp.route("/nuevo", methods=["GET", "POST"])
@@ -21,8 +18,7 @@ def crear():
         if not nombre or not email:
             flash("Todos los campos son obligatorios.", "warning")
             return render_template("usuarios/form.html", usuario=None)
-        usuario = Usuario(nombre=nombre, email=email)
-        repo.crear(usuario)
+        current_app.usuario_service.crear(nombre, email)
         flash("Usuario creado correctamente.", "success")
         return redirect(url_for("usuarios.index"))
     return render_template("usuarios/form.html", usuario=None)
@@ -30,7 +26,7 @@ def crear():
 @bp.route("/<int:usuario_id>/editar", methods=["GET", "POST"])
 @admin_required
 def editar(usuario_id):
-    usuario = repo.obtener_por_id(usuario_id)
+    usuario = current_app.usuario_service.obtener(usuario_id)
     if not usuario:
         flash("Usuario no encontrado.", "danger")
         return redirect(url_for("usuarios.index"))
@@ -42,9 +38,7 @@ def editar(usuario_id):
             flash("Todos los campos son obligatorios.", "warning")
             return render_template("usuarios/form.html", usuario=usuario)
         
-        usuario.nombre = nombre
-        usuario.email = email
-        repo.actualizar(usuario)
+        current_app.usuario_service.actualizar(usuario_id, nombre, email)
         flash("Usuario actualizado correctamente.", "success")
         return redirect(url_for("usuarios.index"))
     
@@ -53,9 +47,9 @@ def editar(usuario_id):
 @bp.route("/<int:usuario_id>/eliminar", methods=["POST"])
 @admin_required
 def eliminar(usuario_id):
-    usuario = repo.obtener_por_id(usuario_id)
+    usuario = current_app.usuario_service.obtener(usuario_id)
     if usuario:
-        repo.eliminar(usuario_id)
+        current_app.usuario_service.eliminar(usuario_id)
         flash("Usuario eliminado correctamente.", "success")
     else:
         flash("Usuario no encontrado.", "danger")

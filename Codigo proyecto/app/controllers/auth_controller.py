@@ -1,11 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from app.services.auth_service import AuthService
-from app.services.dispositivo_service import DispositivoService
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from functools import wraps
 
 bp = Blueprint("auth", __name__)
-auth_service = AuthService()
-disp_service = DispositivoService()
 
 def login_required(view):
     @wraps(view)
@@ -27,24 +23,31 @@ def admin_required(view):
 
 @bp.route("/", methods=["GET"])
 def root():
+    # Si el usuario ya tiene sesión activa, redirigir al dashboard (contenido cambia por rol)
+    if session.get("user_id"):
+        return redirect(url_for("auth.dashboard"))
     return redirect(url_for("auth.login"))
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Si ya hay sesión activa, redirigir al dashboard en vez de mostrar el formulario de login
+    if session.get("user_id"):
+        return redirect(url_for("auth.dashboard"))
+
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
-        user = auth_service.validar_login(email, password)
+        try:
+            current_app.logger.debug(f"auth_controller.login: intento de login para email={email}")
+        except Exception:
+            pass
+        user = current_app.auth_service.validar_login(email, password)
         if user:
             session["user_id"] = user.id
             session["user_name"] = user.nombre
             session["is_admin"] = user.is_admin
-            if user.is_admin:
-                flash(f"Bienvenido administrador {user.nombre}!", "success")
-                return redirect(url_for("auth.admin_dashboard"))
-            else:
-                flash(f"Bienvenido {user.nombre}!", "success")
-                return redirect(url_for("auth.user_dashboard"))
+            flash(f"Bienvenido {user.nombre}!", "success")
+            return redirect(url_for("auth.dashboard"))
         flash("Email o contraseña incorrectos.", "danger")
     return render_template("login.html")
 
@@ -54,16 +57,56 @@ def logout():
     flash("Sesión cerrada.", "info")
     return redirect(url_for("auth.login"))
 
-@bp.route("/admin")
-@admin_required
-def admin_dashboard():
-    users = auth_service.listar_usuarios()
-    dispositivos = disp_service.listar_todos()
-    return render_template("admin/dashboard.html", users=users, dispositivos=dispositivos)
-
 @bp.route("/dashboard")
 @login_required
-def user_dashboard():
+def dashboard():
+    # Dashboard unificado: muestra distinta información según el rol
     user_id = session.get("user_id")
-    user = auth_service.repo.obtener_por_id(user_id)
-    return render_template("dashboard.html", user=user)
+    if session.get("is_admin"):
+        users = current_app.auth_service.listar_usuarios()
+        dispositivos = current_app.dispositivo_service.listar_todos()
+        return render_template("admin/dashboard.html", users=users, dispositivos=dispositivos)
+    else:
+        dispositivos = current_app.dispositivo_service.listar_por_usuario(user_id)
+        user = current_app.auth_service.repo.obtener_por_id(user_id)
+        return render_template("dashboard.html", user=user, dispositivos=dispositivos)
+
+
+@bp.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        if not email:
+            flash('Ingresa un correo válido.', 'warning')
+            return render_template('forgot_password.html')
+        sent = current_app.auth_service.send_reset_email(email)
+        if sent:
+            flash('Si el correo existe en nuestro sistema, se ha enviado un enlace de recuperación.', 'info')
+        else:
+            flash('No se pudo enviar el correo de recuperación. Intenta más tarde.', 'danger')
+        return redirect(url_for('auth.login'))
+    return render_template('forgot_password.html')
+
+
+@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    # Verificar token en GET para mostrar formulario
+    if request.method == 'POST':
+        pw = request.form.get('password', '').strip()
+        pw2 = request.form.get('password_confirm', '').strip()
+        if not pw or pw != pw2:
+            flash('Las contraseñas no coinciden o están vacías.', 'warning')
+            return render_template('reset_password.html', token=token)
+        ok = current_app.auth_service.reset_password_with_token(token, pw)
+        if ok:
+            flash('Contraseña restablecida correctamente. Puedes iniciar sesión.', 'success')
+            return redirect(url_for('auth.login'))
+        flash('El enlace de recuperación no es válido o ha expirado.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+
+    # GET: comprobar token rápido (no estrictamente necesario)
+    email = current_app.auth_service.verify_reset_token(token)
+    if not email:
+        flash('El enlace de recuperación no es válido o ha expirado.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+    return render_template('reset_password.html', token=token)

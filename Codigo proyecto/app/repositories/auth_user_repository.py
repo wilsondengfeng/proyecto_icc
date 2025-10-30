@@ -63,6 +63,18 @@ class AuthUserRepository:
         finally:
             con.close()
 
+    def actualizar_password(self, user_id: int, new_password: str, is_admin: bool = False):
+        """Actualiza la contraseña (ya hasheada) para el usuario/admin indicado."""
+        con = self._get_connection()
+        try:
+            with con.cursor() as cur:
+                table = "admin" if is_admin else "usuarios"
+                cur.execute(f"UPDATE {table} SET password = %s WHERE id = %s", (new_password, user_id))
+                con.commit()
+                return cur.rowcount > 0
+        finally:
+            con.close()
+
     def listar_usuarios(self):
         con = self._get_connection()
         try:

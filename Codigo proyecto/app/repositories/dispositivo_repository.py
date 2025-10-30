@@ -2,7 +2,6 @@ import pymysql
 from flask import current_app
 from app.models.dispositivo import Dispositivo
 
-
 class DispositivoRepository:
     def _get_connection(self):
         return pymysql.connect(

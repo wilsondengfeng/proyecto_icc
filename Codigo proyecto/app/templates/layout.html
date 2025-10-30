@@ -20,21 +20,15 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
-          {% if session.is_admin %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.admin_dashboard') }}">
-              <i class="bi bi-speedometer2"></i> Panel Admin
+            <a class="nav-link" href="{{ url_for('auth.dashboard') }}">
+              <i class="bi bi-speedometer2"></i> Panel
             </a>
           </li>
+          {% if session.is_admin %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('usuarios.index') }}">
               <i class="bi bi-people"></i> Usuarios
-            </a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.user_dashboard') }}">
-              <i class="bi bi-grid"></i> Mi Panel
             </a>
           </li>
           {% endif %}
