@@ -15,10 +15,14 @@
           <div class="mb-3">
             <label class="form-label">Contraseña</label>
             <input name="password" type="password" class="form-control" autocomplete="current-password" required>
-          </div>
-          <button class="btn btn-primary w-100 mb-3">Iniciar sesión</button>
-          <div class="text-center">
+            <div class="text-center">
             <a href="{{ url_for('auth.forgot_password') }}">¿Olvidaste tu contraseña?</a>
+          </div>
+          </div>
+          
+          <button class="btn btn-primary w-100 mb-3">Iniciar sesión</button>
+          <div class="text-center mt-2">
+            ¿No tienes una cuenta? <a href="{{ url_for('auth.register') }}">Regístrate</a>
           </div>
         </form>
       </div>

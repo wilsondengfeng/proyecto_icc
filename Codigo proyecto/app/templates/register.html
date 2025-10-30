@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}Registro - SmartHome{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-3">Crear cuenta</h3>
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input name="nombre" type="text" class="form-control" value="{{ nombre or '' }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input name="email" type="email" class="form-control" value="{{ email or '' }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input name="password" type="password" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirmar contraseña</label>
+            <input name="password_confirm" type="password" class="form-control" required>
+          </div>
+          <button class="btn btn-primary w-100 mb-3">Crear cuenta</button>
+        </form>
+        <div class="text-center">
+          <a href="{{ url_for('auth.login') }}">Volver al login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -72,6 +72,33 @@ def dashboard():
         return render_template("dashboard.html", user=user, dispositivos=dispositivos)
 
 
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    # Registro de nuevos usuarios (usuarios normales, no admin)
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '').strip()
+        password_confirm = request.form.get('password_confirm', '').strip()
+
+        if not nombre or not email or not password:
+            flash('Por favor completa todos los campos.', 'warning')
+            return render_template('register.html', nombre=nombre, email=email)
+        if password != password_confirm:
+            flash('Las contraseñas no coinciden.', 'warning')
+            return render_template('register.html', nombre=nombre, email=email)
+
+        created = current_app.auth_service.crear_usuario(nombre, email, password, is_admin=False)
+        if created:
+            flash('Registro exitoso. Ya puedes iniciar sesión.', 'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('No se pudo crear el usuario. El correo puede ya estar en uso.', 'danger')
+            return render_template('register.html', nombre=nombre, email=email)
+
+    return render_template('register.html')
+
+
 @bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
